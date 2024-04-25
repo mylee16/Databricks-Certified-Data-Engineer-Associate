@@ -74,7 +74,7 @@ DESCRIBE DETAIL employees
 
 -- COMMAND ----------
 
-UPDATE employees 
+UPDATE employees
 SET salary = salary + 100
 WHERE name LIKE "A%"
 

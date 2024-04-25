@@ -37,6 +37,10 @@ DESCRIBE HISTORY orders
 INSERT OVERWRITE orders
 SELECT * FROM parquet.`${dataset.bookstore}/orders`
 
+/* only overwrites table that match the current table schema
+ no risk of modifying table schema
+*/
+
 -- COMMAND ----------
 
 DESCRIBE HISTORY orders
@@ -45,6 +49,8 @@ DESCRIBE HISTORY orders
 
 INSERT OVERWRITE orders
 SELECT *, current_timestamp() FROM parquet.`${dataset.bookstore}/orders`
+
+/* schema mismatch: timestamp won't work because it is not in the current schema */
 
 -- COMMAND ----------
 
@@ -59,6 +65,8 @@ SELECT * FROM parquet.`${dataset.bookstore}/orders-new`
 -- COMMAND ----------
 
 SELECT count(*) FROM orders
+
+/* duplicate data*/
 
 -- COMMAND ----------
 
@@ -76,6 +84,9 @@ ON c.customer_id = u.customer_id
 WHEN MATCHED AND c.email IS NULL AND u.email IS NOT NULL THEN
   UPDATE SET email = u.email, updated = u.updated
 WHEN NOT MATCHED THEN INSERT *
+
+/* merge into: insert, update, and delete, only add new documents */
+/* update when match, if not found then insert */
 
 -- COMMAND ----------
 
@@ -97,3 +108,7 @@ USING books_updates u
 ON b.book_id = u.book_id AND b.title = u.title
 WHEN NOT MATCHED AND u.category = 'Computer Science' THEN 
   INSERT *
+
+-- COMMAND ----------
+
+
